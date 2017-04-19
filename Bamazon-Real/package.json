@@ -1,0 +1,9 @@
+{
+  "name": "bamazon-real",
+  "version": "0.0.0",
+  "description": "Bamazon-Real",
+  "main": "server.js",
+  "author": {
+    "name": "Steven"
+  }
+}
