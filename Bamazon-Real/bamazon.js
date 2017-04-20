@@ -28,7 +28,7 @@ require("jsdom").env("", function (err, window) {
         });
     });
 
-    function prompt(Type, Message, Name, Choices) {
+    prompt = function(Type, Message, Name, Choices) {
         this.type = Type;
         this.message = Message;
         this.name = Name;
@@ -40,6 +40,7 @@ require("jsdom").env("", function (err, window) {
             new prompt("input", "Please type in Item_ID of the product you would like to buy", "itemid", null)
         ]).then(function (answers1) {
             inquirer.prompt([
+
                 new prompt("input", "How many unit of " + answers1.itemid + " would you like to purchase?", "units", null)
             ]).then(function (answers2) {
                 connection.query("SELECT * FROM products where item_id = " + answers1.itemid, function (err, res1) {
