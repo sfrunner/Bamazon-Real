@@ -1,6 +1,8 @@
 ﻿var mysql = require("mysql");
 var inquirer = require("inquirer");
 var fs = require("fs");
+
+
 require("jsdom").env("", function (err, window) {
     if (err) {
         console.error(err);
@@ -46,17 +48,20 @@ require("jsdom").env("", function (err, window) {
                 connection.query("SELECT * FROM products where item_id = " + answers1.itemid, function (err, res1) {
                     if (err) throw err;
                     var unitsAvailable = res1[0].stock_quantity;
+                    var totalSales = res1[0].product_sales;
                     if (answers2.units > unitsAvailable) {
                         console.log("Insufficient Quantity");
                         connection.end();
                     }
                     else if (answers2.units <= unitsAvailable) {
                         unitsAvailable -= answers2.units
+                        totalSales += (res1[0].price * answers2.units);
                         console.log("Order Placed!");
-                        connection.query("UPDATE products SET ? WHERE ?", [{ stock_quantity: unitsAvailable }, { item_id: answers1.itemid }], function (err, res2) {
+                        connection.query("UPDATE products SET ? WHERE ?", [{ stock_quantity: unitsAvailable, product_sales: totalSales }, { item_id: answers1.itemid, item_id: answers1.itemid  }], function (err, res2) {
                             if (err) throw err;
                             console.log("Order Total Due Today: $" + (res1[0].price * answers2.units));
                         });
+                        
                     }
                 });
             });
