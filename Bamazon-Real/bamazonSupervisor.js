@@ -1,6 +1,7 @@
 ﻿var inquirer = require("inquirer");
 var mysql = require("mysql");
 var table = require("cli-table");
+var bamazon = require("./bamazon.js");
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -38,20 +39,21 @@ require("jsdom").env("", function (err, window) {
     });
 
     function viewDepartments() {
-
-        // instantiate 
+        connection.query("SELECT * FROM departments", function(err, res){
+            console.log(res);
+            if(err) throw err;
+             // instantiate 
         var Table = new table({
-            head: ["department+id","department_name","over_head_costs","product_sales","total_profit"]
-            , colWidths: [100, 100,100,100,100]
+            head: ["department_id","department_name","over_head_costs","total_sales","total_profit"]
         });
-
+        $.each(res, function(i,val){
+            var totalProfit = val.total_sales-val.over_head_costs; 
+            Table.push([val.department_id, val.department_name, val.over_head_costs, val.total_sales, totalProfit]);  
+        });
         // table is an Array, so you can `push`, `unshift`, `splice` and friends 
-        Table.push(
-            ['First value', 'Second value']
-            , ['First value', 'Second value']
-        );
-
         console.log(Table.toString());
+        bamazon.startProgram();
+        });
     }
 
     function insertDepartment(){
@@ -69,6 +71,7 @@ require("jsdom").env("", function (err, window) {
             connection.query("INSERT INTO departments SET ?", userInput, function (err, res) {
                 if (err) throw err;
                 console.log("Department Added!")
+                bamazon.startProgram();
             });
         });
     }

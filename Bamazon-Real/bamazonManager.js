@@ -1,4 +1,5 @@
-﻿var inquirer = require("inquirer");
+﻿var bamazon = require("./bamazon.js");
+var inquirer = require("inquirer");
 var mysql = require("mysql");
 var connection = mysql.createConnection({
     host: "localhost",
@@ -51,6 +52,7 @@ require("jsdom").env("", function (err, window) {
                 console.log("SKU: " + val.item_id + ", Product Name: " + val.product_name + ", Price: " + val.price);
             });
         });
+        bamazon.startProgram();
     }
 
     function lowInventory() {
@@ -60,6 +62,7 @@ require("jsdom").env("", function (err, window) {
                 console.log("SKU: " + val.item_id + ", Product Name: " + val.product_name + ", Price: " + val.price);
             });
         });
+        bamazon.startProgram();
     }
 
     function addInventory() {
@@ -79,6 +82,7 @@ require("jsdom").env("", function (err, window) {
                 console.log("Quantity Updated for ID " + answers.id);
             });
         });
+        bamazon.startProgram();
     }
 
     function insertProduct(){
@@ -88,9 +92,15 @@ require("jsdom").env("", function (err, window) {
             this.name = Name;
             this.choices = Choices;
         }
+        var departmentArray = [];
+        connection.query("SELECT * FROM departments", function (err, res) {
+            $.each(res, function (i, val) {
+                departmentArray.push(val.department_name);  
+            });
+        });
         inquirer.prompt([
             new prompt("input", "What is the title of the item?", "title", null),
-            new prompt("input", "Which department should it be categorized in", "department", null),
+            new prompt("list", "Which department should it be categorized in", "department", departmentArray),
             new prompt("input", "What is the selling price?", "price", null),
             new prompt("input", "How many units are available for sale", "units", null),
         ]).then(function (answers) {
@@ -98,6 +108,7 @@ require("jsdom").env("", function (err, window) {
             connection.query("INSERT INTO products SET ?", userInput, function (err, res) {
                 if (err) throw err;
                 console.log("Product Added!")
+                bamazon.startProgram();
             });
         });
     }
