@@ -2,6 +2,7 @@
 var mysql = require("mysql");
 var table = require("cli-table");
 var bamazon = require("./bamazon.js");
+exports.supervisor = function(){
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -75,5 +76,5 @@ require("jsdom").env("", function (err, window) {
             });
         });
     }
-
 });
+}

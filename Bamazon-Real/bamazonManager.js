@@ -1,4 +1,5 @@
 ﻿var bamazon = require("./bamazon.js");
+exports.manager = function(){
 var inquirer = require("inquirer");
 var mysql = require("mysql");
 var connection = mysql.createConnection({
@@ -19,7 +20,6 @@ require("jsdom").env("", function (err, window) {
         console.error(err);
         return;
     }
-
     var $ = require("jquery")(window);
     inquirer.prompt([
         {
@@ -27,7 +27,7 @@ require("jsdom").env("", function (err, window) {
             message: "Please select option (Manager View)",
             name: "action",
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
-        }
+        },
     ]).then(function (answers) {
         
         switch (answers.action) {
@@ -40,49 +40,49 @@ require("jsdom").env("", function (err, window) {
     });
 
     function viewProducts() {
-     
-        connection.connect(function (err) {
-            if (err) {
-                console.log(err)
-            }
-        });
-
         connection.query("SELECT * FROM products", function (err, res) {
+            console.log("");
             $.each(res, function (i, val) {
-                console.log("SKU: " + val.item_id + ", Product Name: " + val.product_name + ", Price: " + val.price);
+                console.log("SKU: " + val.item_id + ", Product Name: " + val.product_name + ", Price: " + val.price, "Quantity Available: " + val.stock_quantity, "Total Product Sales:" + val.product_sales);
             });
         });
         bamazon.startProgram();
     }
 
     function lowInventory() {
-
         connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
+            if(res == ""){
+                console.log("Nothing is below 5 units!")
+            }
             $.each(res, function (i, val) {
-                console.log("SKU: " + val.item_id + ", Product Name: " + val.product_name + ", Price: " + val.price);
+                console.log("Item ID: " + val.item_id + ", Product Name: " + val.product_name + ", Price: " + val.price, "Quantity Available: " + val.stock_quantity, "Total Product Sales:" + val.product_sales);
             });
         });
-        bamazon.startProgram();
+        setTimeout(function(){
+            bamazon.startProgram();
+        },500);
     }
 
     function addInventory() {
         inquirer.prompt([
             {
                 type: "input",
-                message: "Which ID would you like to add more quantity to?",
+                message: "Which ID would you like to update the quantity of?",
                 name: "id"
             },
             {
                 type: "input",
-                message: "How many units would you like to add?",
-                name: "unitsAdd"
+                message: "What is the new quantity?",
+                name: "unitsUpdate"
             }
         ]).then(function (answers) {
-            connection.query("UPDATE products SET ? WHERE ?", [{ stock_quantity: answers.unitsAdd }, { item_id: answers.id }], function (req, res) {
+            connection.query("UPDATE products SET ? WHERE ?", [{ stock_quantity: answers.unitsUpdate }, { item_id: answers.id }], function (req, res) {
                 console.log("Quantity Updated for ID " + answers.id);
             });
+            setTimeout(function(){
+                bamazon.startProgram();
+            },500);
         });
-        bamazon.startProgram();
     }
 
     function insertProduct(){
@@ -108,9 +108,12 @@ require("jsdom").env("", function (err, window) {
             connection.query("INSERT INTO products SET ?", userInput, function (err, res) {
                 if (err) throw err;
                 console.log("Product Added!")
-                bamazon.startProgram();
             });
+            setTimeout(function(){
+                bamazon.startProgram();
+            },500);
         });
     }
 });
+}
 
