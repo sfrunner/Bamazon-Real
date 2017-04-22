@@ -1,8 +1,8 @@
 ﻿var mysql = require("mysql");
 var inquirer = require("inquirer");
 var fs = require("fs");
-
-
+var supervisor = require("./bamazonSupervisor");
+console.log(supervisor.departments);
 require("jsdom").env("", function (err, window) {
     if (err) {
         console.error(err);

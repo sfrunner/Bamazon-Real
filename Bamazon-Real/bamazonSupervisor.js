@@ -24,7 +24,7 @@ require("jsdom").env("", function (err, window) {
     inquirer.prompt([
         {
             type: "list",
-            message: "Please select option (Manager View)",
+            message: "Please select option (Supervisor View)",
             name: "action",
             choices: ["View Products Sales by Department", "Create New Department"]
         }
@@ -32,7 +32,7 @@ require("jsdom").env("", function (err, window) {
 
         switch (answers.action) {
             case "View Product Sales by Department": viewDepartments(); break;
-            //case "Create New Department": lowInventory(); break;
+            case "Create New Department": insertDepartment(); break;
             default: viewDepartments();
         }
     });
@@ -52,6 +52,25 @@ require("jsdom").env("", function (err, window) {
         );
 
         console.log(Table.toString());
+    }
+
+    function insertDepartment(){
+        var prompt = function (Type, Message, Name, Choices) {
+            this.type = Type;
+            this.message = Message;
+            this.name = Name;
+            this.choices = Choices;
+        }
+        inquirer.prompt([
+            new prompt("input", "What is the name of the department?", "departmentName", null),
+            new prompt("input", "What are the overhead costs?", "overHead", null),
+        ]).then(function (answers) {
+            var userInput = { department_name: answers.departmentName, over_head_costs: answers.overHead};
+            connection.query("INSERT INTO departments SET ?", userInput, function (err, res) {
+                if (err) throw err;
+                console.log("Department Added!")
+            });
+        });
     }
 
 });
